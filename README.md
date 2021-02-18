@@ -4,3 +4,6 @@
 * Código em Assembly comentado.
 * Código de máquina correspondente ao código assembly do MIPS que possa ser executado corretamente no MARS.
 * Print de telas do MARS, após a execução de cada teste.
+
+
+#### Participantes do Trabalho: Giovanni Martins, Luiz Fernando Cabral, Gabriel Marinho, Ana Vila, Paloma Azevedo.
