@@ -49,7 +49,7 @@ int main(void) {
 
     // Resultado final da pesquisa
     resultado = binarySearch(array, 0, tamanho - 1, elemento);
-    (resultado == -1) ? printf("\nElemento fora do array digitado!\n") : printf("\nElemento na posicao [%d] do array!\n", resultado);
+    (resultado == -1) ? printf("\nElemento nao foi encontrado no arranjo!\n") : printf("\nElemento na posicao [%d] do array!\n", resultado);
     printf("\n");
     
     return 0;

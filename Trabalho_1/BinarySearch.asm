@@ -100,7 +100,7 @@
    	
    			# Avaliando onde esta o X
    			avaliacond:
-   			beq $t3,$a3,Condicao1	# O elemento do meio e o próprio X
+   			beq $t3,$a3,Condicao1	# O elemento do meio e o proprio X
    			bgt $t3,$a3,Condicao2	# O X possivelmente esta na primeira metade
    			blt $t3,$a3,Condicao3	# O X possivelmente esta na segunda metade
    			
