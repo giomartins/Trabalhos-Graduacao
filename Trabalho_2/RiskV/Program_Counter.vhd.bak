@@ -18,6 +18,7 @@ end entity Program_Counter;
 
 -- Definicao da arquitetura
 architecture arch_Program_Counter of Program_Counter is
+
 begin
 	process(PC_clk, PC_rst)
 	begin

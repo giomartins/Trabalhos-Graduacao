@@ -3,7 +3,7 @@
 -- Chamada das bibliotecas
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEE.std_logic_unsigned.all;
+use IEEE.std_logic_unsigned.all;
 
 -- Definicao da entidade
 entity Register_File is

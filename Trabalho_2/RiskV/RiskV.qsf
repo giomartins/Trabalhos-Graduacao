@@ -55,3 +55,8 @@ set_global_assignment -name VHDL_FILE Instruction_Memory.vhd
 set_global_assignment -name VHDL_FILE Register_File.vhd
 set_global_assignment -name VHDL_FILE Data_Memory.vhd
 set_global_assignment -name VHDL_FILE Program_Counter.vhd
+set_global_assignment -name VHDL_FILE Adder.vhd
+set_global_assignment -name VHDL_FILE Sign_Extend.vhd
+set_global_assignment -name VHDL_FILE Flip_Flop_Reset.vhd
+set_global_assignment -name VHDL_FILE Multiplexer.vhd
+set_global_assignment -name VHDL_FILE Shifter.vhd

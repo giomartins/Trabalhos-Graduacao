@@ -1,0 +1,6 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity Shifter_Left_2 is
+
+end entity Shifter_Left_2;
