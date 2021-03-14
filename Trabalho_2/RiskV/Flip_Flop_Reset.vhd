@@ -8,7 +8,7 @@ entity Flip_Flop_Reset is
 		clock		: in std_logic;
 		reset		: in std_logic;
 		input		: in std_logic_vector(width-1 downto 0);
-		output 	: out std_logic_vector(width-1 downto 0);
+		output 	: out std_logic_vector(width-1 downto 0)
 	);
 end entity Flip_Flop_Reset;
 
