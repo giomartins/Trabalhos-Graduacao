@@ -1,5 +1,5 @@
 Analysis & Synthesis report for RiskV
-Sun Mar 14 11:47:10 2021
+Sun Mar 14 14:29:11 2021
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -36,7 +36,7 @@ applicable agreement for further details.
 +--------------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                         ;
 +------------------------------------+-------------------------------------------------+
-; Analysis & Synthesis Status        ; Failed - Sun Mar 14 11:47:10 2021               ;
+; Analysis & Synthesis Status        ; Failed - Sun Mar 14 14:29:11 2021               ;
 ; Quartus II 64-Bit Version          ; 13.0.1 Build 232 06/12/2013 SP 1 SJ Web Edition ;
 ; Revision Name                      ; RiskV                                           ;
 ; Top-level Entity Name              ; RiskV                                           ;
@@ -155,7 +155,7 @@ Parallel compilation was disabled, but you have multiple processors available. E
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit Analysis & Synthesis
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-    Info: Processing started: Sun Mar 14 11:47:09 2021
+    Info: Processing started: Sun Mar 14 14:29:10 2021
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off RiskV -c RiskV
 Warning (20028): Parallel compilation is not licensed and has been disabled
 Info (12021): Found 2 design units, including 1 entities, in source file riskv.vhd
@@ -188,11 +188,11 @@ Info (12021): Found 2 design units, including 1 entities, in source file multipl
 Info (12021): Found 2 design units, including 1 entities, in source file shifter.vhd
     Info (12022): Found design unit 1: Shifter_Left_2-arch_Shifter
     Info (12023): Found entity 1: Shifter_Left_2
-Error (10887): VHDL error at Register_File.vhd(51): simplified sensitivity list is not supported in VHDL_1993, and is only supported for VHDL 2008 File: C:/Users/marti/OneDrive/Área de Trabalho/AOC/Trabalho_2/RiskV/Register_File.vhd Line: 51
+Error (10381): VHDL Type Mismatch error at Sign_Extend.vhd(18): indexed name returns a value whose type does not match "boolean", the type of the target expression File: C:/Users/marti/OneDrive/Área de Trabalho/AOC/Trabalho_2/RiskV/Sign_Extend.vhd Line: 18
 Error: Quartus II 64-Bit Analysis & Synthesis was unsuccessful. 1 error, 1 warning
-    Error: Peak virtual memory: 4620 megabytes
-    Error: Processing ended: Sun Mar 14 11:47:10 2021
-    Error: Elapsed time: 00:00:01
+    Error: Peak virtual memory: 4621 megabytes
+    Error: Processing ended: Sun Mar 14 14:29:12 2021
+    Error: Elapsed time: 00:00:02
     Error: Total CPU time (on all processors): 00:00:01
 
 

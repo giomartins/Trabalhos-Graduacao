@@ -3,7 +3,7 @@
 -- Chamada das bibliotecas
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.numeric_std_unsigned.all;
+use IEEE.numeric_std.all;
 
 -- Definicao da entidade
 entity Adder is
@@ -16,6 +16,10 @@ end entity adder;
 
 -- Definicao da arquitetura
 architecture arch_Adder of Adder is
+
+signal aux : unsigned;
+
 begin
-	output <= input1 + input2;
+	aux <= unsigned (input1) + unsigned (input2);
+	output <= std_logic_vector(aux);
 end arch_Adder;

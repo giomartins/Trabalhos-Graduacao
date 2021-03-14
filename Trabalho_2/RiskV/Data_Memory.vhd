@@ -3,6 +3,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
+use IEEE.numeric_std.all;
 use std.textio.all;
 
 entity Data_Memory is
@@ -26,10 +27,10 @@ begin
 		loop
 			if rising_edge(DM_clk) then
 				if (DM_we = '1') then
-					mem(to_integer(DM_a(7 downto 0))) := DM_wd;
+					mem(to_integer (unsigned (DM_a(7 downto 0)))) := DM_wd;
 				end if;
 			end if;
-			DM_rd <= mem (to_integer(DM_a(7 downto 2)));
+			DM_rd <= mem (to_integer(unsigned(DM_a(7 downto 2))));
 			wait on DM_clk, DM_a;
 		end loop;
 	end process;

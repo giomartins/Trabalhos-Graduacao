@@ -36,7 +36,7 @@ begin
 		end if;
 	end process;
 	
-	process(all)
+	process(RF_a1, RF_a2)
 	begin
 		if (to_integer(unsigned(RF_a1)) = 0) then
 			RF_rd1 <= X"00000000";
