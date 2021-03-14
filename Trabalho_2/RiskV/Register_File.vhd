@@ -4,6 +4,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
+use IEEE.numeric_std.all;
 
 -- Definicao da entidade
 entity Register_File is
@@ -30,22 +31,22 @@ begin
 	begin
 		if rising_edge(RF_clk) then
 			if RF_we3 = '1' then 
-				registers(to_integer(RF_a3)) <= RF_wd3;
+				registers(to_integer(unsigned(RF_a3))) <= RF_wd3;
 			end if;
 		end if;
 	end process;
 	
 	process(all)
 	begin
-		if (to_integer(RF_a1) = 0) then
+		if (to_integer(unsigned(RF_a1)) = 0) then
 			RF_rd1 <= X"00000000";
 		else
-			RF_rd1 <= registers(to_integer(RF_a1));
+			RF_rd1 <= registers(to_integer(unsigned(RF_a1)));
 		end if;	
-		if (to_integer(RF_a2) = 0) then
+		if (to_integer(unsigned(RF_a2)) = 0) then
 			RF_rd2 <= X"00000000";
 		else
-			RF_rd2 <= registers(to_integer(RF_a2));
+			RF_rd2 <= registers(to_integer(unsigned(RF_a2)));
 		end if;
 	end process;
 end arch_Register_File;
