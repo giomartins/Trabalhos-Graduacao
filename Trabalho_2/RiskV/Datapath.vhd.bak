@@ -1,0 +1,15 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+yse IEEE.numeric_std.all;
+
+
+entity Datapath is
+	port(
+	
+	);
+end entity;
+
+
+architecture arch_Datapath of Datapath is
+
+end arch_Datapath;

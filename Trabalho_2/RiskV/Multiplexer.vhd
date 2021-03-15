@@ -1,18 +1,13 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-
--- Multiplexador 2x1
-entity Multiplexer is
-	generic(width: integer := 8);
-	port(
-		input1	: in std_logic_vector(width - 1 downto 0);
-		input2	: in std_logic_vector(width - 1 downto 0);
-		selector : in std_logic;
-		output	: out std_logic_vector(width - 1 downto 0)
-	);
-end entity Multiplexer;
-
-architecture arch_Mux of Multiplexer is
-begin
-	y <= input2 when selector else input1;
-end arch_Mux;
+library IEEE; 
+use IEEE.STD_LOGIC_1164.all; 
+entity Mux2 is 
+    generic(WIDTH: integer := 32); 
+    port(
+        D0, D1: in STD_LOGIC_VECTOR(WIDTH-1 downto 0); 
+        S: in STD_LOGIC; 
+        Y: out STD_LOGIC_VECTOR(WIDTH-1 downto 0)
+    ); 
+end; 
+architecture behave of Mux2 is 
+    begin Y <= D1 when S = '1' else D0; 
+end;

@@ -1,20 +1,15 @@
--- Implementacao do Sign Extend
+library IEEE; 
+use IEEE.STD_LOGIC_1164.all; 
+entity Signal_Extend is 
+    generic(WIDTH: natural := 32); 
+    port(
+        INPUT: in STD_LOGIC_VECTOR(WIDTH-1 downto 0); 
+        OUTPUT: out STD_LOGIC_VECTOR(31 downto 0)
+    ); 
+end; 
 
--- Chamada das Bibliotecas
-library IEEE;
-use IEEE.std_logic_1164.all;
-
--- Definicao da entidade
-entity Sign_Extend is
-	port(
-		input		: in std_logic_vector(15 downto 0);
-		output		: out std_logic_vector(31 downto 0)
-	);
-end entity Sign_Extend;
-
--- Definicao da arquitetura
-architecture arch_Sign_Extend of Sign_Extend is
-begin
-	output <= X"ffff" & input when input(15) else X"0000" & input;
-
-end arch_Sign_Extend;
+architecture behave of Signal_Extend is 
+begin 
+    OUTPUT <= (31 downto WIDTH => '1') & INPUT when INPUT(WIDTH-1) ='1'
+	 else (31 downto WIDTH => '0') & INPUT;
+end;

@@ -1,5 +1,5 @@
 Assembler report for RiskV
-Wed Mar 10 12:42:35 2021
+Mon Mar 15 08:10:02 2021
 Quartus II 64-Bit Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
 
 
@@ -38,7 +38,7 @@ applicable agreement for further details.
 +---------------------------------------------------------------+
 ; Assembler Summary                                             ;
 +-----------------------+---------------------------------------+
-; Assembler Status      ; Successful - Wed Mar 10 12:42:35 2021 ;
+; Assembler Status      ; Successful - Mon Mar 15 08:10:02 2021 ;
 ; Revision Name         ; RiskV                                 ;
 ; Top-level Entity Name ; RiskV                                 ;
 ; Family                ; Cyclone II                            ;
@@ -117,13 +117,13 @@ applicable agreement for further details.
 Info: *******************************************************************
 Info: Running Quartus II 64-Bit Assembler
     Info: Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-    Info: Processing started: Wed Mar 10 12:42:33 2021
+    Info: Processing started: Mon Mar 15 08:10:00 2021
 Info: Command: quartus_asm --read_settings_files=off --write_settings_files=off RiskV -c RiskV
 Info (115031): Writing out detailed assembly data for power analysis
 Info (115030): Assembler is generating device programming files
 Info: Quartus II 64-Bit Assembler was successful. 0 errors, 0 warnings
-    Info: Peak virtual memory: 4561 megabytes
-    Info: Processing ended: Wed Mar 10 12:42:36 2021
+    Info: Peak virtual memory: 4560 megabytes
+    Info: Processing ended: Mon Mar 15 08:10:03 2021
     Info: Elapsed time: 00:00:03
     Info: Total CPU time (on all processors): 00:00:02
 

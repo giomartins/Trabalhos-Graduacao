@@ -4,7 +4,7 @@ use IEEE.std_logic_1164.all;
 entity Shifter_Left_2 is
 	port(
 		input		: in std_logic_vector(31 downto 0);
-		output	: out std_logic_vec
+		output	: out std_logic_vector(31 downto 0)
 	);
 end entity Shifter_Left_2;
 
