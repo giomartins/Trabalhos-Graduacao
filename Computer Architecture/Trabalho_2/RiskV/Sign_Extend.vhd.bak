@@ -1,0 +1,15 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity Sign_Extend is
+	port(
+		input1		: in std_logic_vector(15 downto 0);
+		output		: out std_logic_vector(31 downto 0);
+	);
+end entity Sign_Extend;
+
+
+architecture arch_Sign_Extend of Sign_Extend is
+
+
+end arch_Sign_Extend;

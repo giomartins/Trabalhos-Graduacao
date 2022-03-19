@@ -1,0 +1,66 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity alu is
+    generic (
+        W       :       integer := 4
+	);
+    port (
+        CONTROL : in    std_logic_vector(3 downto 0);
+        SRC1    : in    std_logic_vector(W - 1 downto 0);
+        SRC2    : in    std_logic_vector(W - 1 downto 0);
+        RESULT  : out   std_logic_vector(W - 1 downto 0);
+        ZERO    : out   std_logic
+    );
+end alu;
+
+
+-- Define the architecture for this entity.
+-- Consider the following operations to calculate the value or RESULT:
+--      CONTROL             RESULT
+--      0000                SRC1 and SRC2 
+--      0001                SRC1 or SRC2
+--      0010                SRC1 + SRC2
+--      0110                SRC1 - SRC2
+--      0111                SRC1 < SRC2
+--      1100                NOT( SRC1 or SRC2 )
+
+-- Consider the following behavior for the ZERO output:
+--  ZERO <= RESULT == 0 ? 1 : 0
+
+architecture arch of alu is
+signal aux,result2 : std_logic_vector (3 downto 0);
+begin
+		
+process (SRC1, SRC2, CONTROL)
+begin
+	if SRC1 < SRC2 then
+		aux <= "1111";
+	else
+		aux <= "0000";
+	end if;
+	
+	
+		
+	case CONTROL is
+		when "0000"  => result2 <= SRC1 and SRC2;
+		when "0001"  => result2 <= SRC1 or SRC2;
+		when "0010"  => result2 <=  std_logic_vector(unsigned(SRC1) + unsigned (SRC2));
+		when "0110"  => result2 <= std_logic_vector(unsigned(SRC1) - unsigned (SRC2));
+		when "0111"  => result2 <= aux;
+		when "1100"  => result2 <= NOT( SRC1 or SRC2 );
+		when others => result2 <= "0000";
+	end case;
+	
+	if result2 = "0000" then
+		ZERO <= '1';
+	else
+		ZERO <='0';
+	end if;
+		 
+end process;
+		
+		 RESULT <= result2;
+		
+end arch;

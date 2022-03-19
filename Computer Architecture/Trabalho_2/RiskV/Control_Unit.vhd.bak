@@ -1,0 +1,7 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity Control_Unit is
+	port(
+	);
+end entity Control_Unit;

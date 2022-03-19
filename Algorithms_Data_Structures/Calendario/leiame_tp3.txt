@@ -1,0 +1,25 @@
+-> O seguinte trabalho prático foi desenvolvido e testado em ambiente Linux(Ubuntu 18.04).
+
+-> Para a sua execução correta, acesse o terminal, e então digite os seguintes comandos
+(entre aspas) para compilar e executar o trabalho da maneira correta:
+
+    *  "gcc main.c tp3.c -o exe"
+       "./exe"
+
+    ** "gcc main.c tp3.c -o executavel.exe"
+       "executavel.exe"
+
+-> Nao e necessario passar nenhum argumento extra na linha de comando.
+
+-> Assim, que o programa começa a ser executado, pede-se o nome do arquivo que armazenam os eventos e suas informacoes.
+
+-> Posteriormente, o usuario escolhe uma das opcoes apos a montagem de arquivo de eventos, seja a impressao do calendario
+no terminal ou pdf, pesquisa ou ordenacao dos arquivos de eventos.
+
+-> Nao foi possivel terminar a montagem da saida do calendario em pdf, foi explicado de maneira mais clara essa parte do
+Trabalho. 
+
+
+Observações:
+* Caso seja executado em ambiente Linux.
+** Caso seja executado em ambiente Windows.
