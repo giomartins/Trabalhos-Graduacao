@@ -1,8 +1,0 @@
-library IEEE;
-USE IEEE.std_logic_arith.all;
-
-entity Flip_Flop_Reset is
-	port(
-		
-	);
-end entity Flip_Flop_Reset;

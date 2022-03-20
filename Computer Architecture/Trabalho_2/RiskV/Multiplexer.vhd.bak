@@ -1,8 +1,0 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-
-
--- Multiplexador 2x1
-entity Multiplexer is
-
-end architecture Multiplexer;
