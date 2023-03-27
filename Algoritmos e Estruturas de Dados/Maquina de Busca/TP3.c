@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "Tp3.h"
+#include "TP3.h"
   
 //Inicia o vetor da tabela Hash
 void Cria_Tabela_Hash(TipoHash *H){

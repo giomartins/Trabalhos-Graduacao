@@ -1,0 +1,149 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+library('corpcor')
+library('pracma')
+
+rm(list = ls())
+
+xr <-runif(10, min = -15, max = 10)
+fgx <- 0.5*xr^2 + 3*xr + 10
+yr <- fgx + rnorm(10, 0, 4)
+
+xt <- linspace(-15, 10, 20)
+yt <- 0.5*xt^2 + 3*xt + 10
+@
+
+
+<<>>=
+# P = 1
+
+H1 <- cbind(xr^1, 1)
+w1 <- pseudoinverse(H1) %*% yr
+
+Ht <- cbind(xt^1, 1)
+yt1 <- Ht %*% w1
+
+plot(xt, yt, type = 'l', col = 'red', main = 'Polinômio de grau 1', sub = 'N = 20', xlab = 'x', ylab = 'y')
+
+points (xr, yr)
+lines (xt, yt1, col = 'blue')
+legend(0, 50, legend = c('Aproximação', 'Função Geradora'), col = c('blue', 'red'), lty = 1:2, cex = 0.8)
+@
+
+<<>>=
+# P = 2
+
+H2 <- cbind(xr^2, xr^1, 1)
+w2 <- pseudoinverse(H2) %*% yr
+
+Ht <- cbind(xt^2, xt^1, 1)
+yt2 <- Ht %*% w2
+
+plot(xt, yt, type = 'l', col = 'red', main = 'Polinômio de grau 2', sub = 'N = 20', xlab = 'x', ylab = 'y')
+
+points (xr, yr)
+lines (xt, yt2, col = 'blue')
+legend(0, 50, legend = c('Aproximação', 'Função Geradora'), col = c('blue', 'red'), lty = 1:2, cex = 0.8)
+@
+
+<<>>=
+# P = 3
+
+H3 <- cbind(xr^3, xr^2, xr^1, 1)
+w3 <- pseudoinverse(H3) %*% yr
+
+Ht <- cbind(xt^3, xt^2, xt^1, 1)
+yt3 <- Ht %*% w3
+
+plot(xt, yt, type = 'l', col = 'red', main = 'Polinômio de grau 3', sub = 'N = 20', xlab = 'x', ylab = 'y')
+
+points (xr, yr)
+lines (xt, yt3, col = 'blue')
+legend(0, 50, legend = c('Aproximação', 'Função Geradora'), col = c('blue', 'red'), lty = 1:2, cex = 0.8)
+@
+
+<<>>=
+# P = 4
+
+H4 <- cbind(xr^4, xr^3, xr^2, xr^1, 1)
+w4 <- pseudoinverse(H4) %*% yr
+
+Ht <- cbind(xt^4, xt^3, xt^2, xt^1, 1)
+yt4 <- Ht %*% w4
+
+plot(xt, yt, type = 'l', col = 'red', main = 'Polinômio de grau 4', sub = 'N = 20', xlab = 'x', ylab = 'y')
+
+points (xr, yr)
+lines (xt, yt4, col = 'blue')
+legend(0, 50, legend = c('Aproximação', 'Função Geradora'), col = c('blue', 'red'), lty = 1:2, cex = 0.8)
+@
+
+<<>>=
+# P = 5
+
+H5 <- cbind(xr^5, xr^4, xr^3, xr^2, xr^1, 1)
+w5 <- pseudoinverse(H5) %*% yr
+
+Ht <- cbind(xt^5, xt^4, xt^3, xt^2, xt^1, 1)
+yt5 <- Ht %*% w5
+
+plot(xt, yt, type = 'l', col = 'red', main = 'Polinômio de grau 5', sub = 'N = 20', xlab = 'x', ylab = 'y')
+
+points (xr, yr)
+lines (xt, yt5, col = 'blue')
+legend(0, 50, legend = c('Aproximação', 'Função Geradora'), col = c('blue', 'red'), lty = 1:2, cex = 0.8)
+@
+
+<<>>=
+# P = 6
+
+H6 <- cbind(xr^6, xr^5, xr^4, xr^3, xr^2, xr^1, 1)
+w6 <- pseudoinverse(H6) %*% yr
+
+Ht <- cbind(xt^6, xt^5, xt^4, xt^3, xt^2, xt^1, 1)
+yt6 <- Ht %*% w6
+
+plot(xt, yt, type = 'l', col = 'red', main = 'Polinômio de grau 6', sub = 'N = 20', xlab = 'x', ylab = 'y')
+
+points (xr, yr)
+lines (xt, yt6, col = 'blue')
+legend(0, 50, legend = c('Aproximação', 'Função Geradora'), col = c('blue', 'red'), lty = 1:2, cex = 0.8)
+@
+
+<<>>=
+# P = 7
+
+H7 <- cbind(xr^7, xr^6, xr^5, xr^4, xr^3, xr^2, xr^1, 1)
+w7 <- pseudoinverse(H7) %*% yr
+
+Ht <- cbind(xt^7, xt^6, xt^5, xt^4, xt^3, xt^2, xt^1, 1)
+yt7 <- Ht %*% w7
+
+plot(xt, yt, type = 'l', col = 'red', main = 'Polinômio de grau 7', sub = 'N = 20', xlab = 'x', ylab = 'y')
+
+points (xr, yr)
+lines (xt, yt7, col = 'blue')
+legend(0, 50, legend = c('Aproximação', 'Função Geradora'), col = c('blue', 'red'), lty = 1:2, cex = 0.8)
+@
+
+<<>>=
+# P = 8
+
+H8 <- cbind(xr^8, xr^7, xr^6, xr^5, xr^4, xr^3, xr^2, xr^1, 1)
+w8 <- pseudoinverse(H8) %*% yr
+
+Ht <- cbind(xt^8, xt^7, xt^6, xt^5, xt^4, xt^3, xt^2, xt^1, 1)
+yt8 <- Ht %*% w8
+
+plot(xt, yt, type = 'l', col = 'red', main = 'Polinômio de grau 8', sub = 'N = 20', xlab = 'x', ylab = 'y')
+
+points (xr, yr)
+lines (xt, yt8, col = 'blue')
+legend(0, 50, legend = c('Aproximação', 'Função Geradora'), col = c('blue', 'red'), lty = 1:2, cex = 0.8)
+@
+
+\end{document}

@@ -1,0 +1,50 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+library('plotly')
+rm(list = ls())
+
+x = seq(-1, 1, by = 0.1)
+y = seq(-1, 1, by = 0.1)
+create_grid <- expand.grid(x, y)
+
+circle <- function(x, y) {
+  y = sqrt(x^2 + y^2)
+  return((1 / (1 + exp(-y))))
+}
+
+raio = 0.6
+classe = 1 * (circle(create_grid$Var1, create_grid$Var2) > raio)
+
+plot(create_grid, xlab = 'x', ylab = 'y', xlim = c(min(x), max(x)), ylim = c(min(y), max(y)))
+
+k = 1
+
+for (i in x) {
+  for (j in y) {
+    if(classe[k] == 1){
+      points(i, j, col = 'red')
+    }
+    k = k + 1
+  }
+}
+
+classe_plot <- matrix(0, 21, 21)
+
+for (lin in 1:21) {
+  for (col in 1:21) {
+    classe_plot[lin, col] <- classe[(lin - 1)*21 + col] 
+  }
+}
+@
+
+
+<<>>=
+plot_data <- plotly(z = new_classe_plot)
+plot_data <- plot_data%>%add_surface()
+plot_data
+@
+\end{document}
