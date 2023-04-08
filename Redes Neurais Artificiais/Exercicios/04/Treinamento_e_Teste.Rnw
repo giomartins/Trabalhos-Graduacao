@@ -1,0 +1,104 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+trainPerceptron <- function(xin, yd, eta, tol, maxEpocas, par) {
+  dimXin <- dim(xin)
+  N <- dimXin[1]
+  n <- dimXin[2]
+  
+  if(par == 1) {
+    wt <- as.matrix(runif(n + 1) - 0.5)
+    xin <- cbind(-1, xin)
+  } else {
+    wt <- as.matrix(runif(n) - 0.5)
+  }
+  
+  nEpocas <- 0
+  eEpoca <- tol + 1
+  evec <- matrix(nrow = 1, ncol = maxEpocas)
+  
+  while ((nEpocas < maxEpocas) && (eEpoca > tol)) {
+    ei2 <- 0
+    xSeq <- sample(N)
+    for(i in 1:N) {
+      iRand <- xSeq[i]
+      yHat <- 1.0 * ((xin[iRand,] %*% wt) >= 0)
+      ei <- yd[iRand] - yHat
+      dw <- eta * ei * xin[iRand,]
+      wt <- wt + dw
+      ei2 <- ei2 + ei * ei
+    }
+    nEpocas <- nEpocas + 1
+    evec[nEpocas] <- ei2 / N
+    eEpoca <- evec[nEpocas]
+  }
+  
+  retList <- list(wt, evec[1:nEpocas])
+  return(retList)
+}
+@
+
+<<>>=
+yPerceptron <- function (xvec, w, par) {
+  if (par == 1){
+    xvec <- cbind(1, xvec)
+  }
+  u <- xvec %*% w
+  y <- 1.0 * (u >= 0)
+  return(as.matrix(y))
+}
+@
+
+<<>>=
+s1 <- 0.4
+s2 <- 0.4
+nc <- 200
+xc1 <- matrix(rnorm(nc * 2), ncol = 2) * s1 + t(matrix((c(2,2)), ncol = nc, nrow = 2))
+xc2 <- matrix(rnorm(nc * 2), ncol = 2) * s2 + t(matrix((c(4,4)), ncol = nc, nrow = 2))
+
+xc1 <- cbind(xc1, 0)
+xc2 <- cbind(xc2, 1)
+x <- rbind(xc1, xc2)
+
+Num = 280
+amostra = sample(400)
+x_train <- x[amostra[1:Num], 1:2]
+y_train <- x[amostra[1:Num], 3]
+Num = 281
+x_test <- x[amostra[Num:400], 1:2]
+y_test <- x[amostra[Num:400], 3]
+
+retlist <- trainPerceptron(x_train, y_train, 0.1, 0.01, 100, 1)
+w <- matrix(retlist[[1]])
+
+y_hat <- yPerceptron(x_test, w, par = 1)
+teste = 120
+
+acuracia <- 1 - ((t(y_test - y_hat) %*% (y_test - y_hat)) / (teste))
+Matriz_confusao <- matrix(0, 2, 2)
+
+for(i in 1:120){
+  if(y_test[i] == 1) {
+    if(y_hat[i,] == 1){ 
+      Matriz_confusao[1,1] = Matriz_confusao[1,1] + 1
+    } else{
+      Matriz_confusao[1,2] = Matriz_confusao[1,2] + 1
+    }
+  }
+  
+  if(y_test[i] == 0) {
+    if(y_hat[i,] == 0){ 
+      Matriz_confusao[2,2] = Matriz_confusao[1,1] + 1
+    } else{
+      Matriz_confusao[2,1] = Matriz_confusao[2,1] + 1
+    }
+  }
+}
+
+
+@
+
+\end{document}

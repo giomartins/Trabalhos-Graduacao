@@ -1,0 +1,97 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+rm(list = ls())
+
+trainAdaline <- function(xin, yd, eta, tol, maxEpocas, par) {
+  dimXin <- dim(xin)
+  N <- dimXin[1]
+  n <- dimXin[2]
+  
+  if(par == 1) {
+    wt <- as.matrix(runif(n + 1) - 0.5)
+    xin <- cbind(1, xin)
+  } else {
+    wt <- as.matrix(runif(n) - 0.5)
+  }
+  
+  nEpocas <- 0
+  eEpoca <- tol + 1
+  evec <- matrix(nrow = 1, ncol = maxEpocas)
+  
+  while ((nEpocas < maxEpocas) && (eEpoca > tol)) {
+    ei2 <- 0
+    xSeq <- sample(N)
+    
+    for(i in 1:N) {
+      iRand <- xSeq[i]
+      yHat <- 1.0 * ((xin[iRand,] %*% wt))
+      ei <- yd[iRand] - yHat
+      dw <- eta * ei * xin[iRand,]
+      wt <- wt + dw
+      ei2 <- ei2 + ei * ei
+    }
+    
+    nEpocas <- nEpocas + 1
+    evec[nEpocas] <- ei2 / N
+    eEpoca <- evec[nEpocas]
+  }
+  
+  retList <- list(wt, evec[1:nEpocas])
+  return(retList)
+}
+@
+
+<<>>=
+# Leitura de Arquivos:
+Ex1_t <- as.matrix(read.table("~/Projetos/Trabalhos-Faculdade/Redes\ Neurais\ Artificiais/Exercicios/03/dados/Ex1_t"))
+Ex1_x <- as.matrix(read.table("~/Projetos/Trabalhos-Faculdade/Redes\ Neurais\ Artificiais/Exercicios/03/dados/Ex1_x"))
+Ex1_y <- as.matrix(read.table("~/Projetos/Trabalhos-Faculdade/Redes\ Neurais\ Artificiais/Exercicios/03/dados/Ex1_y"))
+
+train = sample(1:20)
+
+x_t <- as.matrix(Ex1_x[train[1:14]])
+y_t <- as.matrix(Ex1_y[train[1:14]])
+t_t <- as.matrix(Ex1_t[train[1:14]])
+@
+
+<<>>=
+plot(Ex1_t, Ex1_x, col = "black", type = "b")
+
+for(k in 1:20) {
+  if (k %in% train[1:14]){
+    points(Ex1_t[k], Ex1_y[k], col = "blue", pch = 18)
+  } else {
+    points(Ex1_t[k], Ex1_y[k], col = "blue", pch = 21)
+  }
+}
+
+lines(Ex1_t, Ex1_y, col = "blue")
+legend(4, 1, legend = c("Output", "Input"), col = c("blue", "black"), lty = 1:2, cex = 0.8)
+@
+
+<<>>=
+retlist <- trainAdaline(x_t, y_t, 0.001, 0.001, 1000, 1)
+w <- matrix(retlist[[1]], ncol = 1)
+y_hat <- cbind(1, Ex1_x) %*% w
+
+plot(Ex1_t, Ex1_y, col="black", type = 'b')
+
+for (k in 1:20) {
+  if (k %in% train[1:14]) {
+    points(Ex1_t[k], y_hat[k], col = 'blue', pch = 21)
+  } else {
+    points(Ex1_t[k], y_hat[k], col = 'blue', pch = 18)
+  }
+}
+
+lines(Ex1_t, y_hat, col = 'blue')
+legend(4, 0.8, legend = c('t', 'h'), col = c('blue', 'black'), lty = 1:2, cex = 0.8)
+
+@
+
+
+\end{document}

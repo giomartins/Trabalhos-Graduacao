@@ -1,0 +1,96 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+rm(list = ls())
+
+trainAdaline <- function(xin, yd, eta, tol, maxEpocas, par) {
+  dimXin <- dim(xin)
+  N <- dimXin[1]
+  n <- dimXin[2]
+  
+  if(par == 1) {
+    wt <- as.matrix(runif(n + 1) - 0.5)
+    xin <- cbind(1, xin)
+  } else {
+    wt <- as.matrix(runif(n) - 0.5)
+  }
+  
+  nEpocas <- 0
+  eEpoca <- tol + 1
+  evec <- matrix(nrow = 1, ncol = maxEpocas)
+  
+  while ((nEpocas < maxEpocas) && (eEpoca > tol)) {
+    ei2 <- 0
+    xSeq <- sample(N)
+    
+    for(i in 1:N) {
+      iRand <- xSeq[i]
+      yHat <- 1.0 * ((xin[iRand,] %*% wt))
+      ei <- yd[iRand] - yHat
+      dw <- eta * ei * xin[iRand,]
+      wt <- wt + dw
+      ei2 <- ei2 + ei * ei
+    }
+    
+    nEpocas <- nEpocas + 1
+    evec[nEpocas] <- ei2 / N
+    eEpoca <- evec[nEpocas]
+  }
+  
+  retList <- list(wt, evec[1:nEpocas])
+  return(retList)
+}
+@
+
+<<>>=
+t <- as.matrix(read.table("~/Projetos/Trabalhos-Faculdade/Redes\ Neurais\ Artificiais/Exercicios/03/dados/t"))
+x <- as.matrix(read.table("~/Projetos/Trabalhos-Faculdade/Redes\ Neurais\ Artificiais/Exercicios/03/dados/x"))
+y <- as.matrix(read.table("~/Projetos/Trabalhos-Faculdade/Redes\ Neurais\ Artificiais/Exercicios/03/dados/y"))
+
+treinamento = sample(1:20)
+@
+
+<<>>=
+treinamento = sample(1:20)
+
+plot(t, x[,1], col = 'blue', type = 'b', xlim = c(0, 6), ylim = c(-2, 2))
+par(new = T)
+plot(t, x[,2], col = 'green', type = 'b', xlim = c(0, 6), ylim = c(-2, 2))
+par(new = T)
+plot(t, x[,3], col = 'red', type = 'b', xlim = c(0, 6), ylim = c(-2, 2))
+@
+
+<<>>=
+plot (t, y, col = 'black', type = 'b')
+
+for (k in 1:20) {
+  if (k %in% 1:20) {
+    points(t[k], y[k], col = 'blue', pch = 18)
+  } else {
+    points(t[k], y[k], col = 'black', pch = 21)
+  }
+}
+@
+
+<<>>=
+retlist <- trainAdaline(x, y, 0.001, 0.001, 1000, 1)
+w <- matrix(retlist[[1]], ncol = 1)
+y_hat <- cbind(1, x) %*% w
+
+plot(t, y, col = 'black', type = 'b')
+
+for(k in 1:20) {
+  if(k %in% treinamento[1:14]){
+    points(t[k], y_hat[k], col = 'blue', pch = 21)
+  } else {
+    points(t[k], y_hat[k], col = 'blue', pch = 18)
+  }
+}
+
+lines(t, y_hat, col = 'blue')
+legend(4, 0.8, col = c('blue', 'black'), lty = 1:2, cex = 0.8)
+@
+\end{document}

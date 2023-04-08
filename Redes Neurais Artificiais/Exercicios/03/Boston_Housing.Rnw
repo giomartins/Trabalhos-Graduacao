@@ -1,0 +1,82 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+rm(list = ls())
+
+trainAdaline <- function(xin, yd, eta, tol, maxEpocas, par) {
+  dimXin <- dim(xin)
+  N <- dimXin[1]
+  n <- dimXin[2]
+  
+  if(par == 1) {
+    wt <- as.matrix(runif(n + 1) - 0.5)
+    xin <- cbind(1, xin)
+  } else {
+    wt <- as.matrix(runif(n) - 0.5)
+  }
+  
+  nEpocas <- 0
+  eEpoca <- tol + 1
+  evec <- matrix(nrow = 1, ncol = maxEpocas)
+  
+  while ((nEpocas < maxEpocas) && (eEpoca > tol)) {
+    ei2 <- 0
+    xSeq <- sample(N)
+    
+    for(i in 1:N) {
+      iRand <- xSeq[i]
+      yHat <- 1.0 * ((xin[iRand,] %*% wt))
+      ei <- yd[iRand] - yHat
+      dw <- eta * ei * xin[iRand,]
+      wt <- wt + dw
+      ei2 <- ei2 + ei * ei
+    }
+    
+    nEpocas <- nEpocas + 1
+    evec[nEpocas] <- ei2 / N
+    eEpoca <- evec[nEpocas]
+  }
+  
+  retList <- list(wt, evec[1:nEpocas])
+  return(retList)
+}
+@
+
+<<>>=
+# Implementacao do Problema Boston Housing
+library("mlbench")
+data("BostonHousing")
+
+xall <- matrix(as.numeric(as.matrix(BostonHousing[, 1:13])), nc = 13)
+yall <- matrix(as.numeric(as.matrix(BostonHousing[, 14])), nc = 1)
+
+maxx <- max(xall)
+xall <- xall / maxx
+maxy <- max(yall)
+yall <- yall / maxy
+
+xyall <- cbind(xall, yall)
+library(corrplot)
+corrplot(cor(xyall), method = "number", type = "upper")
+@
+
+<<>>=
+xseq <- sample(506)
+
+xtrain <- as.matrix(xall[xseq[1:400],])
+ytrain <- as.matrix(yall[xseq[1:400],])
+xteste <- as.matrix(xall[xseq[401:506],])
+yteste <- as.matrix(yall[xseq[401:506],])
+
+retlist <- trainAdaline(xtrain, ytrain, 0.1, 0.01, 1000, 1)
+w <- matrix(retlist[[1]], ncol = 1)
+erro2 <- retlist[[2]]
+
+plot(erro2, type = 'l', xlab = 'Epoca', ylab = 'Erro de Treinamento')
+
+@
+
+\end{document}

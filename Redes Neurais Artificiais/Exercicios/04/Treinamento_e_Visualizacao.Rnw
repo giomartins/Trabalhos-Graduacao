@@ -1,0 +1,108 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+trainPerceptron <- function(xin, yd, eta, tol, maxEpocas, par) {
+  dimXin <- dim(xin)
+  N <- dimXin[1]
+  n <- dimXin[2]
+  
+  if(par == 1) {
+    wt <- as.matrix(runif(n + 1) - 0.5)
+    xin <- cbind(-1, xin)
+  } else {
+    wt <- as.matrix(runif(n) - 0.5)
+  }
+  
+  nEpocas <- 0
+  eEpoca <- tol + 1
+  evec <- matrix(nrow = 1, ncol = maxEpocas)
+  
+  while ((nEpocas < maxEpocas) && (eEpoca > tol)) {
+    ei2 <- 0
+    xSeq <- sample(N)
+    for(i in 1:N) {
+      iRand <- xSeq[i]
+      yHat <- 1.0 * ((xin[iRand,] %*% wt) >= 0)
+      ei <- yd[iRand] - yHat
+      dw <- eta * ei * xin[iRand,]
+      wt <- wt + dw
+      ei2 <- ei2 + ei * ei
+    }
+    nEpocas <- nEpocas + 1
+    evec[nEpocas] <- ei2 / N
+    eEpoca <- evec[nEpocas]
+  }
+  
+  retList <- list(wt, evec[1:nEpocas])
+  return(retList)
+}
+@
+
+<<>>=
+yPerceptron <- function (xvec, w, par) {
+  if (par == 1){
+    xvec <- cbind(1, xvec)
+  }
+  u <- xvec %*% w
+  y <- 1.0 * (u >= 0)
+  return(as.matrix(y))
+}
+@
+
+<<>>=
+s1 <- 0.4
+s2 <- 0.4
+nc <- 200
+xc1 <- matrix(rnorm(nc * 2), ncol = 2) * s1 + t(matrix((c(2,2)), ncol = nc, nrow = 2))
+xc2 <- matrix(rnorm(nc * 2), ncol = 2) * s2 + t(matrix((c(4,4)), ncol = nc, nrow = 2))
+
+plot(xc1[,1], xc1[,2], col = 'red', xlim = c(0,6), ylim = c(0,6), xlab = 'x_1', ylab = 'x_2')
+par(new = T)
+plot(xc2[,1], xc2[,2], col = 'blue', xlim = c(0,6), ylim = c(0,6), xlab = '', ylab = '')
+
+x1_reta <- seq(6/100, 6, 6/100)
+x2_reta <- - x1_reta + 6
+
+par(new = T)
+plot(x1_reta, x2_reta, type = 'l', col = 'orange', xlim = c(0,6), ylim = c(0,6), xlab = '', ylab = '')
+@
+
+<<>>=
+xc1 <- cbind(xc1, 0)
+xc2 <- cbind(xc2, 1)
+x <- rbind(xc1, xc2)
+retlist <- trainPerceptron(x[, 1:2], x[,3], 0.1, 0.01, 100, 1)
+w <- matrix(retlist[[1]])
+
+seqi <- seq(0, 6, 0.1)
+seqj <- seq(0, 6, 0.1)
+rt <- matrix(0, nrow = length(seqi), ncol = length(seqj))
+ci <- 0
+
+for (i in seqi){
+  ci <- ci + 1
+  cj <- 0
+  for(j in seqj){
+    cj <- cj + 1
+    x <- as.matrix(t(c(i, j)))
+    rt[ci, cj] <- yPerceptron(x, w, 1)
+  }
+}
+
+plot(xc1[,1], xc1[,2], col = 'red', xlim = c(0,6), ylim = c(0,6), xlab = 'x_1', ylab = 'x_2')
+par(new = T)
+plot(xc2[,1], xc2[,2], col = 'blue', xlim = c(0,6), ylim = c(0,6), xlab = '', ylab = '')
+par(new = T)
+contour(seqi, seqj, rt, xlim = c(0,6), ylim = c(0,6), xlab = '', ylab = '')
+
+
+@
+
+<<>>=
+persp3D(seqi, seqj, rt, counter = T, theta = -20, phi = 30, r = 40, d = 0.1, expand = 0.5, ltheta = 90, lphi = 90, shade = 0.4, ticktype = "detailed", nticks = 5)
+@
+
+\end{document}
