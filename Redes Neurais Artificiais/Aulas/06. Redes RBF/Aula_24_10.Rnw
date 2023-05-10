@@ -1,0 +1,52 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+rm(list=ls())
+# Fazer o load
+load("~/Projetos/Trabalhos-Faculdade/Redes\ Neurais\ Artificiais/Aulas/06.\ Redes\ RBF/data2classXOR.txt")
+
+plot(X[1:60,1], X[1:60,2], type = 'p', xlim = c(0,6), ylim = c(0,6), xlab = 'x1', ylab = 'x2')
+par(new = TRUE)
+plot(X[61:120,1], X[61:120,2], type = 'p', xlim = c(0,6), ylim = c(0,6), xlab = 'x1', ylab = 'x2')
+
+mykmeans <- function(Xin, k) {
+  N <- nrow(Xin)
+  n <- ncol(Xin)
+  
+  Mmedias <- matrix(ncol = n, nrow = k)
+  kindex <- sample(N)
+  
+  Mmedias <- Xin[kindex[1:k],]
+  cy <- matrix(ncol = 1, nrow = N)
+
+  for(i in 1:N) {
+    xt <- Xin[i,]
+    auxmat <- matrix(xt, ncol = n, nrow = k, byrow = T)
+    dmat <- rowSums((auxmat - Mmedias) * (auxmat - Mmedias))
+    cy[i] <- which.min(dmat)
+  }
+   
+  for(j in 1:k) {
+    xindex <- which(cy == j)
+    auxmat2 <- Xin[xindex,]
+    xt2 <- colMeans(auxmat2)
+    Mmedias[j,] <- xt2
+  }
+   
+  return(cy)
+}
+
+retlist <- mykmeans(X, 3)
+print(retlist)
+
+par(new = TRUE)
+plot()
+
+)
+@
+
+
+\end{document}

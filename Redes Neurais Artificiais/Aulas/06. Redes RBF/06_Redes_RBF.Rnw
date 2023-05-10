@@ -1,0 +1,94 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+treinaRBF <- function(xin, yin, p) {
+  # Funcao radial Gaussiana
+  pdfnvar <- function(x, m, K, n) {
+    if (n == 1) {
+      r <- sqrt(as.numeric(K))
+      px <- (1 / (sqrt(2*pi*r*r))) * exp(-0.5 * ((x-m) / (r)) ^ 2)
+    } 
+    else
+      px <- ((1 / (sqrt((2*pi) ^ n * det(K))))) * exp(-0.5 * (t(x-m) %*% (solve(K)) %*% (x-m))))
+    return(px)
+  }
+  
+  N <- dim(xin) [1] # N: numero de amostras
+  n <- dim(xin) [2] # n: dimensao de entrada (> 1)
+  
+  xin <- as.matrix(xin) # xin precisa ser matriz
+  yin <- as.matrix(yin) # yin precisa ser matriz
+  
+  xclust <- kmeans(xin, p)
+  
+  # Armazenando vetores de centro das funcoes
+  m <- as.matrix(xclust$centers)
+  covlist <- list()
+  
+  # Estimando covariancia para todos os centros
+  for (i in 1:p) {
+    ici <- which(xclust$cluster == i)
+    xci <- xin[ici,]
+    if (n == 1)
+      covi <- var(xci)
+    else
+      covi <- cov(xci)
+    covlist[[i]] <- covi
+  }
+  
+  H <- matrix(nrow = N, ncol = p)
+  
+  # Calcula a matriz H
+  for (j in 1:N) {
+    for (i in 1:p) {
+      mi <- m[i,]
+      covi <- covlist[i]
+      covi <- matrix(unlist(covlist[i]), ncol = n, byrow = T) + 0.001 * diag(n)
+      H[i, j] <- pdfnvar(xin[j,], mi, covi, n)
+    }
+  }
+  
+  Haug <- cbind(1, H)
+  W <- solve(t(Haug) %*% Haug) %*% t(Haug)) %*% yin
+
+  return(list(m, covlist, W, H))
+}
+@
+
+<<>>=
+YRBF <- function(xin, modRBF) {
+  # Funcao radial Gaussiana
+  pdfnvar <- function(x, m, K, n) {
+    if (n == 1) {
+      r <- sqrt(as.numeric(K))
+      px <- (1 / (sqrt(2*pi*r*r))) * exp(-0.5 * ((x-m) / (r)) ^ 2)
+    }
+    else 
+      px <- ((1 / (sqrt((2*pi) ^ n * (det(K))))) * exp(-0.5 * (t(x-m) %*%)))
+  }
+}
+@
+
+
+
+
+<<>>=
+treinaRBF <- function (xin, yin, p, par){
+  n <- dim(xin)[2]
+  if(par == 1){
+    xin <- cbind(1, xin)
+    Z <- replicate(p, runif((n+1), -0.5, 0.5))
+  } 
+  else 
+    Z <- replicate(p, runif(n, -0.5, 0.5))
+  H <- tanh(xin %*% Z)
+  W <- ((solve(t(H) %*% H + L * D) %*% t(H)) + 0.0001) %*% yin
+  return(list(W, H, Z))
+}
+@
+
+
+\end{document}

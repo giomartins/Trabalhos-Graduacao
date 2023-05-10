@@ -1,0 +1,48 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+rm(list=ls())  
+
+load("/home/apbraga/PRINCIPAL/livros/LIVRO_R/rotinasGPL/data2classXOR.txt")
+
+calcA <- function(H,L) (t(H) %*% H + L)
+calcP <- function(H,A,N) (diag(N) - H %*% solve(A) %*% t(H))
+
+plot(X[1:60,1],X[1:60,2],type='p',xlim=c(0,6),ylim=c(0,6),xlab="x1",ylab="x2")
+par(new=TRUE)
+plot(X[61:120,1],X[61:120,2],col="red",xlim=c(0,6),ylim=c(0,6),xlab="x1",ylab="x2")
+
+p<-30
+Z<-replicate(p, runif(3,-0.5,0.5))
+
+Xaug<-cbind(replicate(nc*4,1),X)
+H<-tanh(Xaug %*% Z)
+
+N<-nrow(X)
+L<-0.1*diag(p)
+A <- calcA(H,L)
+P <- calcP(H,A,N)
+
+W<-(solve(A) %*% t(H)) %*% Y
+Yhat_train<-(H %*% W) # Sem a função sign()
+
+Je<-t(Y)%*%(P%*%P)%*%Y
+
+Jew<-t(Y-Yhat_train)%*%(Y-Yhat_train)
+print(cbind(Je,Jew))
+
+Jw<-t(Y)%*%(P-P%*%P)%*%Y
+Jww<-t(W)%*%L%*%W
+print(cbind(Jw,Jww))
+
+J<-t(Y)%*%P%*%Y
+Jsum<-Jew+Jww
+print(cbind(J,Jsum))
+
+@
+
+
+\end{document}
