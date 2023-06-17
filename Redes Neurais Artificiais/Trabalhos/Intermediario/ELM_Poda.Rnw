@@ -1,0 +1,254 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+# Funcoes iniciais
+
+rm(list = ls())
+
+library(mlbench)
+library(plot3D)
+library('RSNNS')
+library(corpcor)
+
+trainELM <- function(X, Y, p, par, ψ) {
+  n <- dim(X)[2]
+  if (par == 1){
+    Z <- replicate(p, runif((n+1), -0.5, 0.5))
+    X <- cbind(1, X) # Xaug
+  } else {
+    Z <- replicate(p, runif(n, -0.5, 0.5))
+  }
+  
+  H <- tanh(X %*% Z)
+  
+  # Adicionado código para linearizar neurônios
+  linearize <- apply(H, 2, function(x) {
+    output_range <- range(x)
+    f_psi <- tanh(-ψ) 
+    f_plus_psi <- tanh(+ψ) 
+    output_range[1] > f_psi & output_range[2] < f_plus_psi
+  })
+  
+  H[, linearize] <- X %*% Z[, linearize]
+  
+  W <- pseudoinverse(H) %*% Y
+  retlist <- list(W, H, Z, linearize)
+  return(retlist)
+}
+
+yELM <- function(X, Z, W, par, linearize){
+  n <- dim(X)[2]
+  if (par == 1){
+    X <- cbind(1, X)
+  }
+  H <- tanh(X %*% Z)
+  
+  # Adicionado código para linearizar neurônios
+  H[, linearize] <- X %*% Z[, linearize]
+  
+  Yhat <- sign(H %*% W)
+  return(Yhat)
+}
+
+
+znorm <- function(dados){
+  cols <- dim(dados)[2]
+  dados <- matrix(dados, ncol=cols)
+  for (i in seq(1,cols)){
+    dados[,i] <- ( dados[,i] - min(dados[,i]) )/( max(dados[,i]) - min(dados[,i]) )
+  }
+  return(dados)
+}
+@
+
+<<>>=
+trainELM <- function (xin, yin, p, par, threshold) {
+  n <- dim(xin)[2]
+  if (par == 1) {
+    xin <- cbind(1, xin)
+    Z <- replicate(p, runif((n+1), -0.5, 0.5))
+  } else {
+    Z <- replicate(p, runif(n, -0.5, 0.5))
+  }
+  H <- tanh(xin %*% Z)
+  W <- ((solve(t(H) %*% H) %*% t(H)) + 0.0001) %*% yin
+  
+  # Calcula a importância dos neurônios
+  neuron_importance <- colSums(abs(H * (1 - H) %*% W)^2)
+  
+  # Remove neurônios com importância abaixo do threshold
+  pruned_neurons <- neuron_importance >= threshold
+  H_pruned <- H[, pruned_neurons]
+  Z_pruned <- Z[, pruned_neurons]
+  
+  retlist <- list(W, H_pruned, Z_pruned)
+  
+  return(retlist)
+}
+
+yELM <- function(xin, Z, W, par) {
+  n <- dim(xin)[2]
+  if (par == 1) {
+    xin <- cbind(1, xin)
+  }
+  H <- tanh(xin %*% Z)
+  Yhat <- sign(H %*% W)
+  
+  return(Yhat)
+}
+
+@
+
+<<>>=
+# Breast Cancer
+
+data("BreastCancer")
+BreastCancer <- BreastCancer[complete.cases(BreastCancer),]
+X <- data.matrix(BreastCancer[,(2:10)])
+Y <- data.matrix(2*(as.numeric(BreastCancer[,11])-1.5))
+
+# Dividindo teste e treino
+sample <- sample(c(TRUE, FALSE), nrow(X), replace=TRUE, prob=c(0.7,0.3))
+xtrain  <- X[sample, ]
+xtest   <- X[!sample, ]
+ytrain  <- Y[sample]
+ytest   <- Y[!sample]
+
+#xtrain <- znorm(xtrain)
+#xtest <- znorm(xtest)
+@
+
+<<>>=
+# Pima Indians Diabetes
+
+data("PimaIndiansDiabetes2")
+PimaIndiansDiabetes2 <- PimaIndiansDiabetes2[complete.cases(PimaIndiansDiabetes2),]
+X <- data.matrix(PimaIndiansDiabetes2[,(1:8)])
+Y <- data.matrix(2 * (as.numeric(PimaIndiansDiabetes2[,9]) -1.5))
+
+# Divisao entre teste e treino
+sample <- sample(c(TRUE, FALSE), nrow(X), replace = TRUE, prob = c(0.7, 0.3))
+xtrain <- X[sample, ]
+xtest <- X[!sample, ]
+ytrain <- Y[sample]
+ytest <- Y[!sample]
+@
+
+<<>>=
+testing_wilt <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Intermediario/testing_wilt.csv")
+training_wilt <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Intermediario/training_wilt.csv")
+
+wilt <- rbind(testing_wilt, training_wilt)
+wilt <- wilt[complete.cases(wilt),]
+
+X <- data.matrix(wilt[,(2:6)])
+# Tratando o Y
+Y <- data.matrix(wilt[,(1)])
+Y[,1][Y[,1] == "n"] <- 1
+Y[,1][Y[,1] == "w"] <- -1
+Y <- as.numeric(Y)
+
+sample <- sample(c(TRUE, FALSE), nrow(X), replace = TRUE, prob = c(0.7, 0.3))
+xtrain <- X[sample, ]
+xtest <- X[!sample, ]
+ytrain <- Y[sample]
+ytest <- Y[!sample]
+@
+
+<<>>=
+SPECT_test <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Intermediario/SPECT.test", header=FALSE)
+SPECT_train <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Intermediario/SPECT.train", header=FALSE)
+SPECT <- rbind(SPECT_test, SPECT_train)
+SPECT <- SPECT[complete.cases(SPECT),]
+
+X <- data.matrix(SPECT[,(2:6)])
+Y <- data.matrix(SPECT[,(1)])
+# Tratando Y
+Y[,1][Y[,1] == 0] <- -1
+Y <- as.numeric(Y)
+
+sample <- sample(c(TRUE, FALSE), nrow(X), replace = TRUE, prob = c(0.7, 0.3))
+xtrain <- X[sample, ]
+xtest <- X[!sample, ]
+ytrain <- Y[sample]
+ytest <- Y[!sample]
+
+@
+
+<<>>=
+# Montagem inicial de Entrada e Saida
+ionosphere <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Intermediario/ionosphere.data", header=FALSE)
+ionosphere <- ionosphere[complete.cases(ionosphere),]
+
+X <- data.matrix(ionosphere[,(1:34)])
+#Y <- data.matrix(2 * (as.numeric(ionosphere[,35]) -1.5))
+# Tratando o Y
+Y <- data.matrix(ionosphere[,(35)])
+Y[,1][Y[,1] == "g"] <- 1
+Y[,1][Y[,1] == "b"] <- -1
+Y <- as.numeric(Y)
+
+
+# Divisao entre teste e treinamento
+sample <- sample(c(TRUE, FALSE), nrow(X), replace = TRUE, prob = c(0.7, 0.3))
+xtrain <- X[sample, ]
+xtest <- X[!sample, ]
+ytrain <- Y[sample]
+ytest <- Y[!sample]
+@
+
+
+<<>>=
+xtrain <- znorm(xtrain)
+xtest <- znorm(xtest)
+
+# Valor de ψ
+ψ <- 0.95 # Defina ψ de acordo com sua necessidade
+
+# Treinamento
+# p_tests <- c(1,3,5,7,10,12,14,17,20,25,30,40,50,75, 100, 200)
+p_tests <- c(1,5,10,15,20,30,50,70,90,100,150,200,250,300, 400, 500)
+i <- 1
+M <- matrix(0, nrow=length(p_tests), ncol=2)
+Msd <- matrix(0, nrow=length(p_tests), ncol=2)
+
+for (p in p_tests){
+  total_error_train <- matrix(0, nrow=length(10), ncol=1)
+  total_error_test <- matrix(0, nrow=length(10), ncol=1)
+  for (j in seq(1, 10)){
+
+    result <- trainELM(xtrain, ytrain, p, 1, ψ)
+    Z <- result[[3]]
+    W <- result[[1]]
+    linearize <- result[[4]]
+    
+    Yhat_train <- yELM(xtrain, Z, W, 1, linearize)
+    e_train <- sum((ytrain - Yhat_train)^2)/4
+    e_train_percent <- e_train/length(ytrain)
+    total_error_train[j] <- e_train_percent
+    M[i,1] <- e_train
+    
+    Yhat_test <- yELM(xtest, Z, W, 1, linearize)
+    e_test <- sum((ytest - Yhat_test)^2)/4
+    e_test_percent <- e_test/length(ytest)
+    total_error_test[j] <- e_test_percent
+
+  }
+  M[i,1] <- mean(total_error_train)
+  M[i,2] <- mean(total_error_test)
+  Msd[i,1] <- sd(total_error_train)
+  Msd[i,2] <- sd(total_error_test)
+  i <- i+1
+}
+
+plot(p_tests, M[,1], type='l', lwd= 3, col='red', xlim=c(0, max(p_tests+10)), ylim=c(0, max(M)), ylab = 'M (Erro)', xlab = 'Numero de Neuronios' )
+par(new=T)
+plot(p_tests, M[,2], type='l', lwd= 3, col='black', xlim=c(0, max(p_tests+10)), ylim=c(0, max(M)), ylab = 'M (Erro)', xlab = 'Numero de Neuronios')
+par(new = T)
+legend(x = "topright",legend=c("Erro de Treinamento", "Erro de Teste"), fill=c("red", "black"))
+
+@
+\end{document}
