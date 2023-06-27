@@ -1,0 +1,515 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+# Importacao de bibliotecas
+rm(list = ls())
+library('RSNNS')
+library(mlbench)
+library(plot3D)
+library(corpcor)
+
+# Funcoes de ativacao
+sigmoid <- function(x) {
+  return(1 / (1 + exp(-x)))
+}
+
+relu <- function(x) {
+  return(ifelse(x >= 0, x, 0))
+}
+
+
+# Funcoes da ELM com Poda e com H = tanh
+trainELM_tanh <- function(X, Y, p, par, phi) {
+  n <- dim(X)[2]
+  if (par == 1){
+    Z <- replicate(p, runif((n+1), -0.5, 0.5))
+    X <- cbind(1, X)
+  } else {
+    Z <- replicate(p, runif(n, -0.5, 0.5))
+  }
+  H <- tanh(X %*% Z)
+  
+  # Adicionado código para linearizar neurônios
+  linearize <- apply(H, 2, function(x) {
+    output_range <- range(x)
+    f_psi <- tanh(-phi)
+    f_plus_psi <- tanh(+phi)
+    output_range[1] > f_psi & output_range[2] < f_plus_psi
+    })
+
+  H[,linearize] <- X %*% Z[,linearize]
+  W <- matrix(0, nrow=dim(H)[2], ncol=max(Y))
+  for (k in 1:max(Y)) {
+    W[,k] <- pseudoinverse(H) %*% (Y == k)
+  }
+  retlist <- list(W, H, Z, linearize)
+  return(retlist)
+}
+
+yELM_tanh <- function(X, Z, W, par, linearize){
+  n <- dim(X)[2]
+  if (par == 1){
+    X <- cbind(1, X)
+  }
+  H <- tanh(X %*% Z)
+  # Adicionado código para linearizar neurônios
+  H[,linearize] <- X %*% Z[,linearize]
+  Yhat <- H %*% W
+  return(Yhat)
+}
+
+
+# Funcoes da ELM com Poda e com H = sigm
+trainELM_sigm <- function(X, Y, p, par, phi) {
+  n <- dim(X)[2]
+  if (par == 1){
+    Z <- replicate(p, runif((n+1), -0.5, 0.5))
+    X <- cbind(1, X)
+  } else {
+    Z <- replicate(p, runif(n, -0.5, 0.5))
+  }
+  H <- sigmoid(X %*% Z)
+  
+  # Adicionado código para linearizar neurônios
+  linearize <- apply(H, 2, function(x) {
+    output_range <- range(x)
+    f_psi <- tanh(-phi)
+    f_plus_psi <- tanh(+phi)
+    output_range[1] > f_psi & output_range[2] < f_plus_psi
+    })
+
+  H[,linearize] <- X %*% Z[,linearize]
+  W <- matrix(0, nrow=dim(H)[2], ncol=max(Y))
+  for (k in 1:max(Y)) {
+    W[,k] <- pseudoinverse(H) %*% (Y == k)
+  }
+  retlist <- list(W, H, Z, linearize)
+  return(retlist)
+}
+
+yELM_sigm <- function(X, Z, W, par, linearize){
+  n <- dim(X)[2]
+  if (par == 1){
+    X <- cbind(1, X)
+  }
+  H <- sigmoid(X %*% Z)
+  # Adicionado código para linearizar neurônios
+  H[,linearize] <- X %*% Z[,linearize]
+  Yhat <- H %*% W
+  return(Yhat)
+}
+
+
+# Funcoes da ELM com Poda e com H = relu
+trainELM_relu <- function(X, Y, p, par, phi) {
+  n <- dim(X)[2]
+  if (par == 1){
+    Z <- replicate(p, runif((n+1), -0.5, 0.5))
+    X <- cbind(1, X)
+  } else {
+    Z <- replicate(p, runif(n, -0.5, 0.5))
+  }
+  H <- relu(X %*% Z)
+  
+  # Adicionado código para linearizar neurônios
+  linearize <- apply(H, 2, function(x) {
+    output_range <- range(x)
+    f_psi <- tanh(-phi)
+    f_plus_psi <- tanh(+phi)
+    output_range[1] > f_psi & output_range[2] < f_plus_psi
+    })
+
+  H[,linearize] <- X %*% Z[,linearize]
+  W <- matrix(0, nrow=dim(H)[2], ncol=max(Y))
+  for (k in 1:max(Y)) {
+    W[,k] <- pseudoinverse(H) %*% (Y == k)
+  }
+  retlist <- list(W, H, Z, linearize)
+  return(retlist)
+}
+
+yELM_relu <- function(X, Z, W, par, linearize){
+  n <- dim(X)[2]
+  if (par == 1){
+    X <- cbind(1, X)
+  }
+  H <- relu(X %*% Z)
+  # Adicionado código para linearizar neurônios
+  H[,linearize] <- X %*% Z[,linearize]
+  Yhat <- H %*% W
+  return(Yhat)
+}
+
+
+# Normalizacao
+normalize <- function(x) {
+  return((x - min(x)) / (max(x) - min(x)))
+}
+@
+
+
+
+
+
+
+
+<<>>=
+# Dataset 1: Breast Cancer
+
+data("BreastCancer")
+BreastCancer <- BreastCancer[complete.cases(BreastCancer),]
+
+# Separacao dos Dados do Dataset
+X <- data.matrix(BreastCancer[,(2:10)])
+
+Y_tanh <- data.matrix(2*(as.numeric(BreastCancer[,11])-1.5))
+Y_sigm <- data.matrix(as.numeric(BreastCancer[,11]))
+Y_sigm <- Y_sigm / max(Y_sigm)
+Y_relu <- data.matrix(as.numeric(BreastCancer[,11]))
+
+# Divisao dos dados em treinamento e teste
+set.seed(123)
+training_index <- sample(1:nrow(BreastCancer), 0.7 * nrow(BreastCancer))
+test_index <- setdiff(1:nrow(BreastCancer), training_index)
+
+# Separacao e normalizacao dos dados de entrada para treinamento e teste
+X_training <- X[training_index,]
+X_test <- X[test_index,]
+X_training <- apply(X_training, 2, normalize)
+X_test <- apply(X_test, 2, normalize)
+
+# Separacao das saidas para as diferentes funcoes de ativacao
+Y_training_tanh <- Y_tanh[training_index]
+Y_test_tanh <- Y_tanh[test_index]
+
+Y_training_sigm <- Y_sigm[training_index]
+Y_test_sigm <- Y_sigm[test_index]
+
+Y_training_relu <- Y_relu[training_index]
+Y_test_relu <- Y_relu[test_index]
+@
+
+<<>>=
+# Dataset 2: Pima Indians Diabetes
+
+data("PimaIndiansDiabetes2")
+PimaIndiansDiabetes2 <- PimaIndiansDiabetes2[complete.cases(PimaIndiansDiabetes2),]
+
+# Separacao dos Dados do Dataset
+X <- data.matrix(PimaIndiansDiabetes2[,(1:8)])
+
+Y_tanh <- data.matrix(2*(as.numeric(PimaIndiansDiabetes2[,9])-1.5))
+Y_sigm <- data.matrix(as.numeric(PimaIndiansDiabetes2[,9]))
+Y_sigm <- Y_sigm / max(Y_sigm)
+Y_relu <- data.matrix(as.numeric(PimaIndiansDiabetes2[,9]))
+
+# Divisao dos dados em treinamento e teste
+set.seed(123)
+training_index <- sample(1:nrow(PimaIndiansDiabetes2), 0.7 * nrow(PimaIndiansDiabetes2))
+test_index <- setdiff(1:nrow(PimaIndiansDiabetes2), training_index)
+
+# Separacao e normalizacao dos dados de entrada para treinamento e teste
+X_training <- X[training_index,]
+X_test <- X[test_index,]
+X_training <- apply(X_training, 2, normalize)
+X_test <- apply(X_test, 2, normalize)
+
+# Separacao das saidas para as diferentes funcoes de ativacao
+Y_training_tanh <- Y_tanh[training_index]
+Y_test_tanh <- Y_tanh[test_index]
+
+Y_training_sigm <- Y_sigm[training_index]
+Y_test_sigm <- Y_sigm[test_index]
+
+Y_training_relu <- Y_relu[training_index]
+Y_test_relu <- Y_relu[test_index]
+@
+
+<<>>=
+# Dataset3: SPECT
+
+SPECT_test <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Final/SPECT.test", header=FALSE)
+SPECT_train <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Final/SPECT.train", header=FALSE)
+
+X_training <- SPECT_train[,2:23]
+X_test <- SPECT_test[,2:23]
+X_training <- apply(X_training, 2, normalize)
+X_test <- apply(X_test, 2, normalize)
+Y_training <- SPECT_train[,1]
+Y_test <- SPECT_test[,1]
+
+Y_training_tanh <- Y_training
+Y_test_tanh <- Y_test
+Y_training_sigm <- Y_training
+Y_test_sigm <- Y_test
+Y_training_relu <- Y_training
+Y_test_relu <- Y_test
+
+
+# Separacao das saidas de treinamento e teste para as diferentes funcoes de ativacao
+Y_training_tanh <- ifelse(Y_training_tanh == 0, -1, Y_training_tanh)
+Y_training_tanh <- ifelse(Y_training_tanh == 1, 1, Y_training_tanh)
+Y_training_sigm <- ifelse(Y_training_sigm == 0, 0.5, Y_training_sigm)
+Y_training_sigm <- ifelse(Y_training_sigm == 1, 1, Y_training_sigm)
+Y_training_relu <- ifelse(Y_training_relu == 1, 2, Y_training_relu)
+Y_training_relu <- ifelse(Y_training_relu == 0, 1, Y_training_relu)
+
+
+Y_test_tanh <- ifelse(Y_test_tanh == 0, -1, Y_test_tanh)
+Y_test_tanh <- ifelse(Y_test_tanh == 1, 1, Y_test_tanh)
+Y_test_sigm <- ifelse(Y_test_sigm == 0, 0.5, Y_test_sigm)
+Y_test_sigm <- ifelse(Y_test_sigm == 1, 1, Y_test_sigm)
+Y_test_relu <- ifelse(Y_test_relu == 1, 2, Y_test_relu)
+Y_test_relu <- ifelse(Y_test_relu == 0, 1, Y_test_relu)
+@
+
+<<>>=
+# Dataset 4: Ionosphere
+
+ionosphere <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Final/ionosphere.data", header=FALSE)
+
+# Separacao dos Dados do Dataset
+X <- data.matrix(ionosphere[,(1:34)])
+Y <- data.matrix(ionosphere[,35])
+
+# Divisao dos dados em treinamento e teste
+set.seed(123)
+training_index <- sample(1:nrow(ionosphere), 0.7 * nrow(ionosphere))
+test_index <- setdiff(1:nrow(ionosphere), training_index)
+
+# Separacao dos dados de entrada e saida para treinamento e teste
+X_training <- X[training_index,]
+X_test <- X[test_index,]
+
+Y_training_tanh <- Y[training_index,]
+Y_test_tanh <- Y[test_index,]
+Y_training_sigm <- Y[training_index,]
+Y_test_sigm <- Y[test_index,]
+Y_training_relu <- Y[training_index,]
+Y_test_relu <- Y[test_index,]
+
+# Ajuste das saidas para as funcoes de ativacao
+Y_training_tanh <- ifelse(Y_training_tanh == "b", -1, Y_training_tanh)
+Y_training_tanh <- ifelse(Y_training_tanh == "g", 1, Y_training_tanh)
+
+Y_training_sigm <- ifelse(Y_training_sigm == "b", 0.5, Y_training_sigm)
+Y_training_sigm <- ifelse(Y_training_sigm == "g", 1, Y_training_sigm)
+
+Y_training_relu <- ifelse(Y_training_relu == "b", 1, Y_training_relu)
+Y_training_relu <- ifelse(Y_training_relu == "g", 2, Y_training_relu)
+
+Y_test_tanh <- ifelse(Y_test_tanh == "b", -1, Y_test_tanh)
+Y_test_tanh <- ifelse(Y_test_tanh == "g", 1, Y_test_tanh)
+
+Y_test_sigm <- ifelse(Y_test_sigm == "b", 0.5, Y_test_sigm)
+Y_test_sigm <- ifelse(Y_test_sigm == "g", 1, Y_test_sigm)
+
+Y_test_relu <- ifelse(Y_test_relu == "b", 1, Y_test_relu)
+Y_test_relu <- ifelse(Y_test_relu == "g", 2, Y_test_relu)
+
+# Conversao para o valor numerico
+Y_training_tanh <- as.numeric(Y_training_tanh)
+Y_training_sigm <- as.numeric(Y_training_sigm)
+Y_training_relu <- as.numeric(Y_training_relu)
+
+Y_test_tanh <- as.numeric(Y_test_tanh)
+Y_test_sigm <- as.numeric(Y_test_sigm)
+Y_test_relu <- as.numeric(Y_test_relu)
+@
+
+<<>>=
+# Dataset 5: WILT
+
+training_wilt <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Final/training_wilt.csv")
+testing_wilt <- read.csv("C:/Projetos/Trabalhos-Faculdade/Redes Neurais Artificiais/Trabalhos/Final/testing_wilt.csv")
+
+# Separacao dos dados de entrada
+X_training <- data.matrix(training_wilt[,2:6])
+X_test <- data.matrix(testing_wilt[,2:6])
+X_training <- apply(X_training, 2, normalize)
+X_test <- apply(X_test, 2, normalize)
+
+# Separacao dos dados de saida
+Y_training <- data.matrix(training_wilt[,1])
+Y_test <- data.matrix(testing_wilt[,1])
+
+Y_training_tanh <- Y_training
+Y_test_tanh <- Y_test
+Y_training_sigm <- Y_training
+Y_test_sigm <- Y_test
+Y_training_relu <- Y_training
+Y_test_relu <- Y_test
+
+
+# Ajuste das saidas para as funcoes de ativacao
+Y_training_tanh <- ifelse(Y_training_tanh == "n", -1, Y_training_tanh)
+Y_training_tanh <- ifelse(Y_training_tanh == "w", 1, Y_training_tanh)
+
+Y_training_sigm <- ifelse(Y_training_sigm == "n", 0.5, Y_training_sigm)
+Y_training_sigm <- ifelse(Y_training_sigm == "w", 1, Y_training_sigm)
+
+Y_training_relu <- ifelse(Y_training_relu == "n", 1, Y_training_relu)
+Y_training_relu <- ifelse(Y_training_relu == "w", 2, Y_training_relu)
+
+Y_test_tanh <- ifelse(Y_test_tanh == "n", -1, Y_test_tanh)
+Y_test_tanh <- ifelse(Y_test_tanh == "w", 1, Y_test_tanh)
+
+Y_test_sigm <- ifelse(Y_test_sigm == "n", 0.5, Y_test_sigm)
+Y_test_sigm <- ifelse(Y_test_sigm == "w", 1, Y_test_sigm)
+
+Y_test_relu <- ifelse(Y_test_relu == "n", 1, Y_test_relu)
+Y_test_relu <- ifelse(Y_test_relu == "w", 2, Y_test_relu)
+
+# Conversao para o valor numerico
+Y_training_tanh <- as.numeric(Y_training_tanh)
+Y_training_sigm <- as.numeric(Y_training_sigm)
+Y_training_relu <- as.numeric(Y_training_relu)
+
+Y_test_tanh <- as.numeric(Y_test_tanh)
+Y_test_sigm <- as.numeric(Y_test_sigm)
+Y_test_relu <- as.numeric(Y_test_relu)
+@
+
+
+
+<<>>=
+number_neurons <- c(1,5,10,15,20,30, 50, 100)
+i <- 1
+M <- matrix(0, nrow=length(number_neurons), ncol=6)
+Msd <- matrix(0, nrow=length(number_neurons), ncol=6)
+phi <- 0.95
+
+for (n in number_neurons){
+  
+  # TANGENTE HIPERBOLICA
+  total_error_train <- matrix(0, nrow=length(10), ncol=1)
+  total_error_test <- matrix(0, nrow=length(10), ncol=1)
+  for (j in seq(1, 10)){
+
+    result <- trainELM_tanh(X_training, Y_training_tanh, n, 1, phi)
+    Z <- result[[3]]
+    W <- result[[1]]
+    linearize <- result[[4]]
+
+    Yhat_train <- yELM_tanh(X_training, Z, W, 1, linearize)
+    e_train <- sum((Y_training_tanh - Yhat_train)^2)/4
+    e_train_percent <- e_train/length(Y_training_tanh)
+    total_error_train[j] <- e_train_percent
+
+    Yhat_test <- yELM_tanh(X_test, Z, W, 1, linearize)
+    e_test <- sum((Y_test_tanh - Yhat_test)^2)/4
+    e_test_percent <- e_test/length(Y_test_tanh)
+    total_error_test[j] <- e_test_percent
+
+  }
+  M[i,1] <- mean(total_error_train)
+  M[i,2] <- mean(total_error_test)
+  Msd[i,1] <- sd(total_error_train)
+  Msd[i,2] <- sd(total_error_test)
+  #-----------------------------------------------------------------------------------------------------------
+  
+  
+  # SIGMOIDE
+  total_error_train <- matrix(0, nrow=length(10), ncol=1)
+  total_error_test <- matrix(0, nrow=length(10), ncol=1)
+  for (j in seq(1, 10)){
+
+    result <- trainELM_sigm(X_training, Y_training_sigm, n, 1, phi)
+    Z <- result[[3]]
+    W <- result[[1]]
+    linearize <- result[[4]]
+
+    Yhat_train <- yELM_sigm(X_training, Z, W, 1, linearize)
+    e_train <- sum((Y_training_sigm - Yhat_train)^2)/4
+    e_train_percent <- e_train/length(Y_training_sigm)
+    total_error_train[j] <- e_train_percent
+
+    Yhat_test <- yELM_sigm(X_test, Z, W, 1, linearize)
+    e_test <- sum((Y_test_sigm - Yhat_test)^2)/4
+    e_test_percent <- e_test/length(Y_test_sigm)
+    total_error_test[j] <- e_test_percent
+
+  }
+  M[i,3] <- mean(total_error_train)
+  M[i,4] <- mean(total_error_test)
+  Msd[i,3] <- sd(total_error_train)
+  Msd[i,4] <- sd(total_error_test)
+  #-----------------------------------------------------------------------------------------------------------
+  
+  # RELU
+  total_error_train <- matrix(0, nrow=length(10), ncol=1)
+  total_error_test <- matrix(0, nrow=length(10), ncol=1)
+  for (j in seq(1, 10)){
+
+    result <- trainELM_relu(X_training, Y_training_relu, n, 1, phi)
+    Z <- result[[3]]
+    W <- result[[1]]
+    linearize <- result[[4]]
+
+    Yhat_train <- yELM_relu(X_training, Z, W, 1, linearize)
+    e_train <- sum((Y_training_relu - Yhat_train)^2)/4
+    e_train_percent <- e_train/length(Y_training_relu)
+    total_error_train[j] <- e_train_percent
+
+    Yhat_test <- yELM_relu(X_test, Z, W, 1, linearize)
+    e_test <- sum((Y_test_relu - Yhat_test)^2)/4
+    e_test_percent <- e_test/length(Y_test_relu)
+    total_error_test[j] <- e_test_percent
+
+  }
+  M[i,5] <- mean(total_error_train)
+  M[i,6] <- mean(total_error_test)
+  Msd[i,5] <- sd(total_error_train)
+  Msd[i,6] <- sd(total_error_test)
+  
+  
+  i <- i + 1
+}
+
+cat("Acabou!\n")
+@
+
+
+<<>>=
+# PLOTANDO ERROS DE TESTE
+
+plot(number_neurons, M[,2], type='l', lwd= 3, col='red', ylim = c(0, max(M)), ylab = 'M (Erro - ELM Podada)', xlab = 'Numero de Neuronios')
+par(new = T)
+plot(number_neurons, M[,4], type='l', lwd= 3, col='blue', ylim = c(0, max(M)), ylab = 'M (Erro - ELM Podada)', xlab = 'Numero de Neuronios')
+par(new = T)
+plot(number_neurons, M[,6], type='l', lwd= 3, col='green', ylim = c(0, max(M)), ylab = 'M (Erro - ELM Podada)', xlab = 'Numero de Neuronios')
+par(new = T)
+legend(x = "topright",legend=c("Erro de Teste - Tahn", 
+                               "Erro de Teste - Sigm", 
+                               "Erro de Teste - Relu"), 
+                               fill=c("red", "blue", "green"))
+@
+
+
+
+<<>>=
+# PLOTANDO ERROS DE TREINAMENTO E TESTE
+
+plot(number_neurons, M[,1], type='l', lwd= 3, col='red',, ylim = c(0, 2), ylab = 'M (Erro)', xlab = 'Numero de Neuronios' )
+par(new=T)
+plot(number_neurons, M[,2], type='l', lwd= 3, col='pink', ylim = c(0, 2), ylab = 'M (Erro)', xlab = 'Numero de Neuronios')
+par(new = T)
+plot(number_neurons, M[,3], type='l', lwd= 3, col='black', ylim = c(0, 2), ylab = 'M (Erro)', xlab = 'Numero de Neuronios' )
+par(new=T)
+plot(number_neurons, M[,4], type='l', lwd= 3, col='gray', ylim = c(0, 2), ylab = 'M (Erro)', xlab = 'Numero de Neuronios')
+par(new = T)
+plot(number_neurons, M[,5], type='l', lwd= 3, col='blue',, ylim = c(0, 2), ylab = 'M (Erro)', xlab = 'Numero de Neuronios' )
+par(new=T)
+plot(number_neurons, M[,6], type='l', lwd= 3, col='lightblue', ylim = c(0, 2), ylab = 'M (Erro)', xlab = 'Numero de Neuronios')
+par(new = T)
+legend(x = "topright",legend=c("Erro de Treinamento - Tahn", "Erro de Teste - Tahn", 
+                               "Erro de Treinamento - Sigm", "Erro de Teste - Sigm", 
+                               "Erro de Treinamento - Relu", "Erro de Teste - Relu"), 
+                               fill=c("red", "pink", "black", "gray", "blue", "lightblue"))
+@
+
+
+\end{document}
