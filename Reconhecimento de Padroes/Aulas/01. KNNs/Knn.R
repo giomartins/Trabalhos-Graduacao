@@ -2,17 +2,31 @@ rm(list = ls());
 
 # k é 
 ourKNN <- function(xTeste, xin, yin, k){
-  #byrow faz o preenchimento por linha
-  xRepete <- matrix(xTeste, byrow=T, nrow = dim(xin)[1], ncol = dim(xin)[2])
-  dmat1 <- rowSums((xRepete - xin)*(xRepete - xin))
+    #byrow faz o preenchimento por linha
+    xRepete <- matrix(xTeste, byrow=T, nrow = dim(xin)[1], ncol = dim(xin)[2])
+    dmat1 <- rowSums((xRepete - xin)*(xRepete - xin))
   
-  # matriz1 %*% matriz2 -> símbolo para multiplicação de matriz
-  # matriz1 * matriz2 -> multiplicação elemento a elemento, ou seja, eleva ao quadrado cada elemento
+    # matriz1 %*% matriz2 -> símbolo para multiplicação de matriz
+    # matriz1 * matriz2 -> multiplicação elemento a elemento, ou seja, eleva ao quadrado cada elemento
 
-  seqNN <- order(dmat1)
-  yhat <- sign(sum(y[seqNN[1:k]]))
-  return(yhat)
+    seqNN <- order(dmat1)
+    yhat <- sign(sum(y[seqNN[1:k]]))
+    return(yhat)
 }
+
+ourKNNponderado <- function(xt, xin, yin, k, h){
+    xrep <- matrix(xt, byrow = T, nrow = dim(xin)[1], ncol = dim(xin)[2])
+    
+    dmat1 <- data.matrix(rowSums((xrep - xin) * (xrep - xin)))
+    seqNN <- order(dmat1)
+    Yknn <- yin[seqNN[1:k]]
+    
+    xx <- exp(-dmat1[seqNN[1:k]] / h^2)
+    yhat <- sign(sum(Yknn * xx))
+    
+    return(yhat)
+}
+
 
 N1 <- 30
 xc1 <- matrix(rnorm(N1*2,sd=1.2),ncol = 2, nrow = N1)+matrix(c(2,2),ncol=2,nrow = N1)
