@@ -1,6 +1,6 @@
 # Trabalhos da Graduação
 
-Repositório que agrupa trabalhos desenvolvidos em disciplinas vinculadas ao campo de computação pela graduação em Engenharia Elétrica pela Universidade Federal de Minas Gerais. Mais abaixo, é possível visualizar a ementa do conteúdo lecionado em cada disciplina.
+Repositório que agrupa trabalhos desenvolvidos em disciplinas vinculadas ao certificado de computação pela graduação em Engenharia Elétrica na Universidade Federal de Minas Gerais. Mais abaixo, é possível visualizar a ementa do conteúdo lecionado em cada disciplina.
 
 ## Disciplinas
 
