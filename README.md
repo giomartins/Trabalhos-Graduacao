@@ -6,6 +6,7 @@ Repositório que agrupa trabalhos desenvolvidos em disciplinas vinculadas ao cer
 
 ### 1. Algoritmos e Estruturas de Dados
 
+#### Ementa:
 - Projeto e Análise de Algoritmos, projeto de algoritmos, refinamento sucessivo;
 - Tipos abstratos de dados;
 - Alocação dinâmica de memória;
@@ -18,7 +19,6 @@ Repositório que agrupa trabalhos desenvolvidos em disciplinas vinculadas ao cer
 - Algoritmos de Pesquis;
 - Pesquisa em tabelas: Sequencial, binária, transformação de chave (hashing);
 
-Para mais informações, [clique aqui](https://homepages.dcc.ufmg.br/~meira/aeds2/#:~:text=Objetivo,simples%20da%20complexidade%20de%20algoritmos.).
 
 ### 2. Arquitetura e Organização de Computados
 
@@ -29,7 +29,6 @@ Para mais informações, [clique aqui](https://homepages.dcc.ufmg.br/~meira/aeds
 - Ferramentas para análise, desenvolvimento e depuração. Microprocessadores comerciais; 
 - Projetos de aplicações com microprocessadores e interfaces de E/S. Multiprocessamento.
 
-Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/91218/72633).
 
 ### 3. Bancos de Dados
 
@@ -42,7 +41,6 @@ Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/912
 - Linguagense pacotes; 
 - Recuperacao de informacao.
 
-Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2377/91205/60486).
 
 ### 4. Otimização
 
@@ -54,12 +52,10 @@ Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2377/912
 - Programação linear; 
 - Aplicações.
 
-Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/90195/64347).
 
 ### 5. Processamento de Sinais
 
 #### Ementa:
-
 - Representação não-paramétrica de sistemas lineares invariantes no tempo. 
 - Dualidade tempo-freqüência: representação de sinais periódicos por séries de Fourier, transformada de Fourier contínua. 
 - Filtragem. 
@@ -71,10 +67,15 @@ Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/901
 - Princípios de estimação espectral. 
 - Projeto de filtros analógicos e digitais.
 
-Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/91218/61106).
 
 ### 6. Processamento Digital de Imagens
 
+#### Ementa:
+- Fundamentos da imagem digital;
+- Modelos e manipulação de cores;
+- Filtragem e pré-processamento;
+- Segmentação e detecção de bordas;
+- Transformadas e processamento no domínio da frequência.
 
 
 ### 7. Projetos de Sistemas Embutidos
@@ -88,7 +89,6 @@ Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/912
 - Interfaces dedicadas; 
 - Projeto visando o baixo consumo de energia.
 
-Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/91218/64326).
 
 ### 8. Reconhecimento de Padrões
 
@@ -106,7 +106,6 @@ Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/912
 - Métodos estocásticos;
 - Validação e comparação de classificadores.
 
-Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/91218/72649).
 
 ### 9. Redes Neurais Artificiais
 
@@ -116,10 +115,8 @@ Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/912
 - Memória de matriz de correlação. 
 - "Perceptrons", "Back propagation", Redes de Hopfield. 
 - Máquina de Boltzmann. 
-Modelos recorrentes. 
+- Modelos recorrentes. 
 - Identificação, supervisão e controle de processos utilizando redes neurais artificiais.
-
-Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/91218/72645).
 
 
 ### 10. Sistemas Nebulosos
@@ -131,5 +128,3 @@ Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2405/912
 - Logica nebulosa; 
 - Topicos avancados em sistemas nebulosos: redes neurofuzzy, geracao automatica de regras;
 - Aplicações: controle e identificacao de falhas em processos.
-
-Para mais informações, [clique aqui](https://ufmg.br/cursos/graduacao/2366/91701/63756).
